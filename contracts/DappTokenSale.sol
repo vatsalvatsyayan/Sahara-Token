@@ -4,10 +4,11 @@ import "./DappToken.sol";
 
 contract DappTokenSale {
 
-	address admin;
+	address payable admin;
 	DappToken public tokenContract;
 	uint256 public tokenPrice;
 	uint256 public tokensSold;
+	address payable addr;
 
 	event Sell(address _buyer, uint256 _amount);
 
@@ -20,6 +21,9 @@ contract DappTokenSale {
 
 		//Token Price
 		tokenPrice = _tokenPrice;
+
+		addr = payable(address(admin));
+		
 	} 
 
 	// multiply 
@@ -46,4 +50,21 @@ contract DappTokenSale {
 		emit Sell(msg.sender, _numberOfTokens);
 
 	}
+
+	// Ending the token sale
+	// function endSale() public {
+	// 	// Require that only admin can perform this function
+	// 	require(msg.sender == admin);
+	// 	// When IOC is finished, we want to transfer the number of tokens back to the admin
+	// 	require(tokenContract.transfer(admin, tokenContract.balanceOf(address(this))));
+	// 	// Destroy the contract, the code is immutable so the state variables will be cleared out
+	// 	selfdestruct(payable(admin));
+
+	// }
+
+	function endSale() public {
+        require(msg.sender == admin);
+        require(tokenContract.transfer(admin,tokenContract.balanceOf(address(this))));
+        selfdestruct(admin);
+    }
 }
